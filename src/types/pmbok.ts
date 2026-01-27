@@ -2595,6 +2595,8 @@ export interface ProjectManagementPlan {
   projectMetrics: ProjectMetrics;
 }
 
+export type ProjectHealth = 'green' | 'yellow' | 'red' | 'critical';
+
 export interface ProjectMetrics {
   overallHealth: ProjectHealth;
   schedulePerformance: number; // SPI

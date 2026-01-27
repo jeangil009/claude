@@ -14,7 +14,8 @@ import {
   Eye,
   Calendar,
   User,
-  Target
+  Target,
+  Clock
 } from 'lucide-react';
 import type {
   QualityManagementPlan,

@@ -850,6 +850,7 @@ export const sampleProjectManagementPlan: ProjectManagementPlan = {
         criteria: ['Productividad', 'Calidad', 'Trabajo en equipo'],
         feedbackProcess: 'Reunión individual con supervisor'
       },
+      conflictResolution: 'Mediación por supervisor directo, escalamiento a Director de Proyecto si no se resuelve en 48 horas',
       recognitionProgram: {
         criteria: ['Mejor desempeño', 'Sin accidentes', 'Innovación'],
         types: ['Bono', 'Reconocimiento público', 'Día libre'],
@@ -1515,7 +1516,15 @@ export const sampleProjectManagementPlan: ProjectManagementPlan = {
           lessonsLearned: ['Mejorar señalización en segundo nivel']
         }
       ],
-      externalResources: []
+      externalResources: [],
+      recoveryProcedures: [
+        'Evaluación de daños por equipo de emergencia',
+        'Notificación a autoridades correspondientes',
+        'Aseguramiento del área afectada',
+        'Coordinación con seguros y ajustadores',
+        'Plan de reanudación de operaciones',
+        'Comunicación a stakeholders sobre estado de recuperación'
+      ]
     },
     trainingProgram: {
       trainingMatrix: [],
@@ -1712,7 +1721,8 @@ export const sampleProjectManagementPlan: ProjectManagementPlan = {
         decisionBy: 'Ing. Roberto García',
         decisionRationale: 'Ahorro sin afectar calidad',
         status: 'completed',
-        attachments: []
+        attachments: [],
+        relatedChanges: []
       }
     ],
     impactAssessmentCriteria: []
@@ -1724,7 +1734,7 @@ export const sampleProjectManagementPlan: ProjectManagementPlan = {
   lessonsLearned: [],
 
   projectMetrics: {
-    overallHealth: 'good',
+    overallHealth: 'green',
     schedulePerformance: 0.95,
     costPerformance: 1.02,
     qualityScore: 97,

@@ -212,21 +212,22 @@ export function ProjectCharterComponent({ charter, onUpdate, readOnly = false }:
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                <MapPin className="w-4 h-4 inline mr-1" /> Ubicación
+                <MapPin className="w-4 h-4 inline mr-1" /> Alcance del Proyecto
               </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={(data as ProjectCharter).scope?.projectScope || ''}
-                  onChange={(e) => setTempData({
-                    ...tempData,
-                    scope: { ...tempData.scope, projectScope: e.target.value } as ProjectCharter['scope']
-                  })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="text-gray-900">{charter.scope?.projectScope || 'No especificada'}</p>
-              )}
+              <div className="text-gray-900">
+                <p className="font-medium text-sm">Incluido:</p>
+                <ul className="list-disc list-inside text-sm mb-2">
+                  {charter.scope?.inScope?.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  )) || <li>No especificado</li>}
+                </ul>
+                <p className="font-medium text-sm">Excluido:</p>
+                <ul className="list-disc list-inside text-sm">
+                  {charter.scope?.outOfScope?.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  )) || <li>No especificado</li>}
+                </ul>
+              </div>
             </div>
           </div>
 
