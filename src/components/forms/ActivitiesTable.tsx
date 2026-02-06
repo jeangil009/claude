@@ -9,7 +9,7 @@ import {
   Filter
 } from 'lucide-react';
 import { Activity, ActivityCategory, CATEGORY_LABELS } from '../../types';
-import { formatCurrency, formatPercent } from '../../utils/evmCalculations';
+import { formatCurrency } from '../../utils/evmCalculations';
 import { ProgressBar } from '../dashboard/ProgressBar';
 
 interface ActivitiesTableProps {
@@ -22,6 +22,15 @@ interface ActivitiesTableProps {
 
 type SortField = 'wbsCode' | 'name' | 'percentComplete' | 'plannedCost' | 'actualCost';
 type SortOrder = 'asc' | 'desc';
+
+function SortIcon({ field, sortField, sortOrder }: { field: SortField; sortField: SortField; sortOrder: SortOrder }) {
+  if (sortField !== field) return null;
+  return sortOrder === 'asc' ? (
+    <ChevronUp className="w-4 h-4" />
+  ) : (
+    <ChevronDown className="w-4 h-4" />
+  );
+}
 
 export function ActivitiesTable({
   activities,
@@ -80,15 +89,6 @@ export function ActivitiesTable({
       setSortField(field);
       setSortOrder('asc');
     }
-  };
-
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return null;
-    return sortOrder === 'asc' ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
   };
 
   const startEditProgress = (activity: Activity) => {
@@ -166,7 +166,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1">
                   WBS
-                  <SortIcon field="wbsCode" />
+                  <SortIcon sortField={sortField} sortOrder={sortOrder} field="wbsCode" />
                 </div>
               </th>
               <th
@@ -175,7 +175,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1">
                   Actividad
-                  <SortIcon field="name" />
+                  <SortIcon sortField={sortField} sortOrder={sortOrder} field="name" />
                 </div>
               </th>
               <th
@@ -184,7 +184,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1">
                   Progreso
-                  <SortIcon field="percentComplete" />
+                  <SortIcon sortField={sortField} sortOrder={sortOrder} field="percentComplete" />
                 </div>
               </th>
               <th
@@ -193,7 +193,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1 justify-end">
                   Planificado
-                  <SortIcon field="plannedCost" />
+                  <SortIcon sortField={sortField} sortOrder={sortOrder} field="plannedCost" />
                 </div>
               </th>
               <th
@@ -202,7 +202,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1 justify-end">
                   Real
-                  <SortIcon field="actualCost" />
+                  <SortIcon sortField={sortField} sortOrder={sortOrder} field="actualCost" />
                 </div>
               </th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">

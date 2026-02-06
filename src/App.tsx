@@ -60,15 +60,6 @@ function App() {
     }
   };
 
-  const handleExport = () => {
-    const data = {
-      project,
-      metrics,
-      exportedAt: new Date().toISOString()
-    };
-    console.log('Exported data:', data);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -104,7 +95,6 @@ function App() {
             project={project}
             onUpdate={updateProject}
             onRecalculateBudget={recalculateBudget}
-            onExport={handleExport}
             onReset={resetToSampleData}
           />
         )}

@@ -1,5 +1,5 @@
 import { ProjectHealth } from '../../types';
-import { CheckCircle2, AlertCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
 interface HealthIndicatorProps {
   health: ProjectHealth;
