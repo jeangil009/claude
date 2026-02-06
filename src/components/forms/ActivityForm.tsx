@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { X, Save, Plus } from 'lucide-react';
 import { Activity, ActivityCategory, CATEGORY_LABELS } from '../../types';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ActivityFormProps {
   activity?: Activity;
@@ -16,7 +15,7 @@ export function ActivityForm({ activity, onSave, onCancel, isEditing = false }: 
     name: activity?.name || '',
     description: activity?.description || '',
     plannedStartDate: activity?.plannedStartDate || new Date().toISOString().split('T')[0],
-    plannedEndDate: activity?.plannedEndDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    plannedEndDate: activity?.plannedEndDate || (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split('T')[0]; })(),
     actualStartDate: activity?.actualStartDate || '',
     actualEndDate: activity?.actualEndDate || '',
     plannedCost: activity?.plannedCost || 0,
