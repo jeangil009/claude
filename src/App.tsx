@@ -6,6 +6,7 @@ import { ActivityForm } from './components/forms/ActivityForm';
 import { ProjectSettings } from './components/forms/ProjectSettings';
 import { useProject } from './hooks/useProject';
 import { Activity } from './types';
+import { exportFullReport } from './utils/exportUtils';
 
 function App() {
   const {
@@ -61,12 +62,7 @@ function App() {
   };
 
   const handleExport = () => {
-    const data = {
-      project,
-      metrics,
-      exportedAt: new Date().toISOString()
-    };
-    console.log('Exported data:', data);
+    exportFullReport(project, metrics, activitySummaries);
   };
 
   return (

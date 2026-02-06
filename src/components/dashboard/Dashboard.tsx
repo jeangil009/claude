@@ -6,10 +6,12 @@ import {
   Clock,
   CheckCircle2,
   AlertTriangle,
-  Activity
+  Activity,
+  Download
 } from 'lucide-react';
 import { EVMMetrics, ChartDataPoint, ActivitySummary, TrendAnalysis, Project } from '../../types';
 import { formatCurrency, formatPercent, formatIndex } from '../../utils/evmCalculations';
+import { exportActivitiesCsv, exportMetricsCsv, exportFullReport } from '../../utils/exportUtils';
 import { MetricCard } from './MetricCard';
 import { HealthIndicator } from './HealthIndicator';
 import { ProgressBar, ComparisonBars } from './ProgressBar';
@@ -20,6 +22,7 @@ import { PerformanceGauge } from '../charts/PerformanceGauge';
 import { VarianceChart } from '../charts/VarianceChart';
 import { ProjectionChart } from '../charts/ProjectionChart';
 import { TCPIIndicator } from '../charts/TCPIIndicator';
+import { PerformanceTrendChart } from '../charts/PerformanceTrendChart';
 
 interface DashboardProps {
   project: Project;
@@ -167,6 +170,31 @@ export function Dashboard({
         </div>
       </div>
 
+      {/* Botones de exportacion */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => exportFullReport(project, metrics, activitySummaries)}
+          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Reporte Completo (CSV)
+        </button>
+        <button
+          onClick={() => exportActivitiesCsv(project)}
+          className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Exportar Actividades
+        </button>
+        <button
+          onClick={() => exportMetricsCsv(project, metrics)}
+          className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Exportar Metricas
+        </button>
+      </div>
+
       {/* KPIs principales */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <MetricCard
@@ -186,7 +214,7 @@ export function Dashboard({
         <MetricCard
           title="CPI"
           value={formatIndex(metrics.CPI)}
-          subtitle="Índice de Desempeño de Costo"
+          subtitle="Indice de Desempeno de Costo"
           trend={metrics.CPI >= 1 ? 'up' : 'down'}
           trendValue={metrics.CPI >= 1 ? 'Eficiente' : 'Ineficiente'}
           icon={<Target className="w-5 h-5" />}
@@ -195,7 +223,7 @@ export function Dashboard({
         <MetricCard
           title="SPI"
           value={formatIndex(metrics.SPI)}
-          subtitle="Índice de Desempeño de Cronograma"
+          subtitle="Indice de Desempeno de Cronograma"
           trend={metrics.SPI >= 1 ? 'up' : 'down'}
           trendValue={metrics.SPI >= 1 ? 'A tiempo' : 'Retrasado'}
           icon={<Clock className="w-5 h-5" />}
@@ -226,23 +254,26 @@ export function Dashboard({
       {/* Gráfica de Curva S */}
       <SCurveChart data={chartData} currency={project.currency} />
 
+      {/* Tendencia CPI/SPI - Nueva visualizacion */}
+      <PerformanceTrendChart data={chartData} />
+
       {/* Gauges de rendimiento */}
       <div className="grid md:grid-cols-2 gap-6">
         <PerformanceGauge
           value={metrics.CPI}
-          label="CPI - Índice de Costo"
+          label="CPI - Indice de Costo"
           description="Eficiencia en el uso del presupuesto"
         />
         <PerformanceGauge
           value={metrics.SPI}
-          label="SPI - Índice de Cronograma"
+          label="SPI - Indice de Cronograma"
           description="Eficiencia en el cumplimiento del cronograma"
         />
       </div>
 
       {/* Comparación de valores */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h3 className="font-semibold text-gray-900 mb-4">Comparación de Valores</h3>
+        <h3 className="font-semibold text-gray-900 mb-4">Comparacion de Valores</h3>
         <ComparisonBars
           items={[
             { label: 'Valor Planificado (PV)', value: metrics.PV, color: 'bg-blue-500' },
@@ -251,6 +282,7 @@ export function Dashboard({
             { label: 'Presupuesto (BAC)', value: metrics.BAC, color: 'bg-gray-400' }
           ]}
           max={metrics.BAC}
+          currency={project.currency}
         />
       </div>
 
@@ -278,7 +310,7 @@ export function Dashboard({
       <div className="grid md:grid-cols-2 gap-4">
         <FormulaCard title="Valores Base" formulas={basicFormulas} defaultExpanded />
         <FormulaCard title="Varianzas" formulas={varianceFormulas} />
-        <FormulaCard title="Índices de Desempeño" formulas={indexFormulas} />
+        <FormulaCard title="Indices de Desempeno" formulas={indexFormulas} />
         <FormulaCard title="Proyecciones" formulas={projectionFormulas} />
       </div>
 
@@ -291,7 +323,7 @@ export function Dashboard({
           <div className="p-2 bg-indigo-100 rounded-lg">
             <Activity className="w-5 h-5 text-indigo-600" />
           </div>
-          <h3 className="font-semibold text-gray-900">Análisis de Tendencias</h3>
+          <h3 className="font-semibold text-gray-900">Analisis de Tendencias</h3>
         </div>
         <div className="grid md:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
@@ -300,8 +332,8 @@ export function Dashboard({
               trends.cpiTrend === 'improving' ? 'text-green-600' :
               trends.cpiTrend === 'declining' ? 'text-red-600' : 'text-gray-600'
             }`}>
-              {trends.cpiTrend === 'improving' ? '📈 Mejorando' :
-               trends.cpiTrend === 'declining' ? '📉 Declinando' : '➡️ Estable'}
+              {trends.cpiTrend === 'improving' ? 'Mejorando' :
+               trends.cpiTrend === 'declining' ? 'Declinando' : 'Estable'}
             </p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
@@ -310,8 +342,8 @@ export function Dashboard({
               trends.spiTrend === 'improving' ? 'text-green-600' :
               trends.spiTrend === 'declining' ? 'text-red-600' : 'text-gray-600'
             }`}>
-              {trends.spiTrend === 'improving' ? '📈 Mejorando' :
-               trends.spiTrend === 'declining' ? '📉 Declinando' : '➡️ Estable'}
+              {trends.spiTrend === 'improving' ? 'Mejorando' :
+               trends.spiTrend === 'declining' ? 'Declinando' : 'Estable'}
             </p>
           </div>
           <div className="p-4 bg-gray-50 rounded-lg">
@@ -327,9 +359,9 @@ export function Dashboard({
               trends.riskLevel === 'medium' ? 'text-amber-600' :
               trends.riskLevel === 'high' ? 'text-orange-600' : 'text-red-600'
             }`}>
-              {trends.riskLevel === 'low' ? '🟢 Bajo' :
-               trends.riskLevel === 'medium' ? '🟡 Medio' :
-               trends.riskLevel === 'high' ? '🟠 Alto' : '🔴 Crítico'}
+              {trends.riskLevel === 'low' ? 'Bajo' :
+               trends.riskLevel === 'medium' ? 'Medio' :
+               trends.riskLevel === 'high' ? 'Alto' : 'Critico'}
             </p>
           </div>
         </div>

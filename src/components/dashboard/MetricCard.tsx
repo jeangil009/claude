@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface MetricCardProps {
@@ -12,7 +12,7 @@ interface MetricCardProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function MetricCard({
+export const MetricCard = memo(function MetricCard({
   title,
   value,
   subtitle,
@@ -80,4 +80,4 @@ export function MetricCard({
       </div>
     </div>
   );
-}
+});

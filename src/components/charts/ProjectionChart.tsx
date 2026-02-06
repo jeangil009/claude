@@ -1,14 +1,3 @@
-import {
-  ComposedChart,
-  Area,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine
-} from 'recharts';
 import { EVMMetrics } from '../../types';
 
 interface ProjectionChartProps {
@@ -17,13 +6,6 @@ interface ProjectionChartProps {
 }
 
 export function ProjectionChart({ metrics, currency = 'MXN' }: ProjectionChartProps) {
-  // Generar datos de proyección
-  const projectionData = [
-    { name: 'Inicio', actual: 0, projected: 0, bac: metrics.BAC },
-    { name: 'Actual', actual: metrics.AC, projected: metrics.AC, bac: metrics.BAC },
-    { name: 'Proyección', actual: null, projected: metrics.EAC_typical, bac: metrics.BAC },
-  ];
-
   // Datos para la gráfica de comparación de EAC
   const eacComparison = [
     { name: 'BAC Original', value: metrics.BAC, color: '#3b82f6' },

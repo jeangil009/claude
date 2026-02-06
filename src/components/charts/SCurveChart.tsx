@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   LineChart,
   Line,
@@ -16,7 +17,7 @@ interface SCurveChartProps {
   currency?: string;
 }
 
-export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
+export const SCurveChart = memo(function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
       return `$${(value / 1000000).toFixed(1)}M`;
@@ -143,4 +144,4 @@ export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
       </div>
     </div>
   );
-}
+});
