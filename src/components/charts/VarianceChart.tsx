@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   BarChart,
   Bar,
@@ -17,7 +18,7 @@ interface VarianceChartProps {
   currency?: string;
 }
 
-export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceChartProps) {
+export const VarianceChart = memo(function VarianceChart({ activities, type, currency = 'MXN' }: VarianceChartProps) {
   const data = activities
     .filter(act => act.percentComplete > 0)
     .map(act => ({
@@ -136,4 +137,4 @@ export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceCh
       </div>
     </div>
   );
-}
+});

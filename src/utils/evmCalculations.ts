@@ -321,10 +321,19 @@ export function generateSCurveData(project: Project, periods: number = 12): Char
 /**
  * Genera resumen de actividades para reportes
  */
-export function generateActivitySummaries(project: Project): ActivitySummary[] {
+export function generateActivitySummaries(project: Project, asOfDate: Date = new Date()): ActivitySummary[] {
   return project.activities.map(activity => {
     const ev = calculateEarnedValue(activity);
-    const pv = activity.plannedCost * (activity.percentComplete / 100);
+    const activityStart = parseISO(activity.plannedStartDate);
+    const activityEnd = parseISO(activity.plannedEndDate);
+    let pv = 0;
+    if (isAfter(asOfDate, activityEnd) || asOfDate.getTime() === activityEnd.getTime()) {
+      pv = activity.plannedCost;
+    } else if (isAfter(asOfDate, activityStart)) {
+      const totalDays = differenceInDays(activityEnd, activityStart) || 1;
+      const elapsedDays = differenceInDays(asOfDate, activityStart);
+      pv = activity.plannedCost * Math.min(elapsedDays / totalDays, 1);
+    }
     const cv = ev - activity.actualCost;
     const sv = ev - pv;
     const cpi = activity.actualCost > 0 ? ev / activity.actualCost : 1;

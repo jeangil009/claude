@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 interface PerformanceGaugeProps {
   value: number;
   label: string;
@@ -11,7 +13,7 @@ interface PerformanceGaugeProps {
   };
 }
 
-export function PerformanceGauge({
+export const PerformanceGauge = memo(function PerformanceGauge({
   value,
   label,
   description,
@@ -131,4 +133,4 @@ export function PerformanceGauge({
       </div>
     </div>
   );
-}
+});

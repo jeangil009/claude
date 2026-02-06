@@ -72,9 +72,10 @@ interface ComparisonBarsProps {
     color: string;
   }[];
   max: number;
+  currency?: string;
 }
 
-export function ComparisonBars({ items, max }: ComparisonBarsProps) {
+export function ComparisonBars({ items, max, currency = 'MXN' }: ComparisonBarsProps) {
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
@@ -84,7 +85,7 @@ export function ComparisonBars({ items, max }: ComparisonBarsProps) {
             <span className="text-sm text-gray-500">
               {new Intl.NumberFormat('es-MX', {
                 style: 'currency',
-                currency: 'MXN',
+                currency: currency,
                 minimumFractionDigits: 0
               }).format(item.value)}
             </span>
