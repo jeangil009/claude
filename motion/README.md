@@ -59,3 +59,21 @@ Es una estimación y la animación lo indica en pantalla. Para reportes formales
 - Sin marca ni logo: se agrega según a nombre de quién vaya el entregable.
 - EAC típico = BAC / CPI, igual que en la app; la proyección se dibuja hasta la fecha
   de fin planificada.
+
+## Flujo de trabajo (estudio)
+
+Los archivos de esta carpeta son el contrato de la pieza; el video se regenera desde ellos:
+
+- `brief.md`: qué dice la pieza, qué datos son reales y qué es inaceptable.
+- `style-guide.md`: paleta, tipografía y reglas de movimiento.
+- `shotlist.md`: beats con tiempos, estado de entrada y salida y propósito.
+- `scurve_evm.py`: la escena. Es determinista: mismo JSON, mismo video.
+- `tools/contact_sheet.py`: un cuadro por beat del shotlist para revisar sin ver el video completo.
+- `reviews/`: contact sheets y defectos encontrados por iteración.
+
+Ciclo: renderizar → contact sheet → anotar los defectos con tiempo y evidencia en `reviews/` → corregir solo eso → renderizar de nuevo.
+
+```bash
+manim -qm scurve_evm.py EVMSCurve
+python tools/contact_sheet.py media/videos/scurve_evm/720p30/EVMSCurve.mp4 reviews/002-contact-sheet.png
+```

@@ -64,6 +64,11 @@ MONTHS_ES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct
 
 config.background_color = "#0F172A"
 
+# Tipografía explícita: sin esto Manim usa una serif por defecto del sistema.
+# Si la fuente no está instalada, Pango cae a una sans-serif genérica.
+FONT = os.environ.get("EVM_FONT", "Inter")
+Text.set_default(font=FONT)
+
 C_PV, C_EV, C_AC, C_EAC = BLUE_C, GREEN_C, RED_C, YELLOW_C
 
 
@@ -203,14 +208,14 @@ class EVMSCurve(Scene):
         while cursor <= end:
             day = (cursor - start).days
             if 0 <= day <= total_days:
-                lab = Text(MONTHS_ES[cursor.month - 1], font_size=16, color=GREY_B)
+                lab = Text(MONTHS_ES[cursor.month - 1], font_size=20, color=GREY_B)
                 labels.add(lab.next_to(axes.c2p(day, 0), DOWN, buff=0.12))
             cursor = date(cursor.year + (cursor.month == 12), cursor.month % 12 + 1, 1)
         v = y_step
         while v <= y_max:
-            labels.add(Text(axis_label(v), font_size=16, color=GREY_B).next_to(axes.c2p(0, v), LEFT, buff=0.12))
+            labels.add(Text(axis_label(v), font_size=20, color=GREY_B).next_to(axes.c2p(0, v), LEFT, buff=0.12))
             v += y_step
-        unit_lbl = Text(cur, font_size=16, color=GREY_B).next_to(axes.c2p(0, y_max), UP, buff=0.1).align_to(axes, LEFT)
+        unit_lbl = Text(cur, font_size=20, color=GREY_B).next_to(axes.c2p(0, y_max), UP, buff=0.1).align_to(axes, LEFT)
         self.play(FadeIn(labels), FadeIn(unit_lbl), run_time=0.6)
 
         def polyline(fn, upto: float, color, width=4):
@@ -223,7 +228,7 @@ class EVMSCurve(Scene):
         # ---- BAC y PV -----------------------------------------------------
         bac_line = DashedLine(axes.c2p(0, m["BAC"]), axes.c2p(total_days, m["BAC"]),
                               color=WHITE, stroke_width=2, dash_length=0.12)
-        bac_txt = Text(f"BAC {money(m['BAC'], cur)}", font_size=18).next_to(bac_line, UP, buff=0.08).align_to(bac_line, LEFT)
+        bac_txt = Text(f"BAC {money(m['BAC'], cur)}", font_size=18).next_to(bac_line, UP, buff=0.08).align_to(bac_line, LEFT).shift(RIGHT * 0.2)
         self.play(Create(bac_line), FadeIn(bac_txt), run_time=0.8)
 
         pv_fn = lambda i: planned_value(project, start + timedelta(days=int(i)))
@@ -288,7 +293,7 @@ class EVMSCurve(Scene):
             eac_tag = Text("EAC", font_size=18, color=C_EAC).next_to(eac_dot, UP, buff=0.12)
             vac_line = Line(axes.c2p(total_days, m["BAC"]), axes.c2p(total_days, m["EAC"]),
                             color=YELLOW_C, stroke_width=5).shift(RIGHT * 0.12)
-            vac_tag = Text("VAC", font_size=16, color=YELLOW_C).next_to(vac_line, RIGHT, buff=0.06).shift(DOWN * 0.25)
+            vac_tag = Text("VAC", font_size=18, color=YELLOW_C).next_to(vac_line, RIGHT, buff=0.06).shift(DOWN * 0.25)
             self.play(Create(eac_line), run_time=1.6)
             self.play(FadeIn(eac_dot), FadeIn(eac_tag), Create(vac_line), FadeIn(vac_tag), run_time=0.8)
             extra = [("EAC", money(m["EAC"], cur), C_EAC),
@@ -305,7 +310,7 @@ class EVMSCurve(Scene):
         verdict.move_to(panel.get_bottom() + UP * 0.38)
         note = None
         if not history:
-            note = Text("EV y AC reconstruidos por actividad (estimación)", font_size=14, color=GREY_B).to_edge(DOWN, buff=0.15)
+            note = Text("EV y AC reconstruidos por actividad (estimación)", font_size=18, color=GREY_B).to_edge(DOWN, buff=0.15)
         self.play(FadeIn(verdict, shift=UP * 0.1), *( [FadeIn(note)] if note else [] ), run_time=0.8)
         self.wait(2.5)
         self.play(*[FadeOut(mob) for mob in self.mobjects], run_time=0.8)
