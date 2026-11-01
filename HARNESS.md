@@ -4,16 +4,13 @@ Comando único de prueba:
 
     npx vitest run && npm run build && npm run lint
 
-**Desviación documentada (línea base):** `npm run lint` ya falla ANTES de cualquier cambio con 27 errores, todos en `src/components/` (intocable; 0 en la zona de trabajo). Gate operativo por paso mientras el Ingeniero no decida:
-
-    npx vitest run && npm run build && npx eslint src/utils vitest.config.ts
-
-El comando completo se reporta aparte cada mañana con su salida real.
+**Estado del lint:** la desviación inicial (27 errores preexistentes en `src/components/`) quedó resuelta por autorización expresa del Ingeniero. El comando completo de arriba es otra vez el único gate.
 
 Rama: `claude/new-session-k42o7l` · Nunca push a main · Sin deploys · Entrega: 07:00 (hora de Panamá)
 
 ## Intocables
-`.claude/` `public/` `vercel.json` `vite.config.ts` `src/components/` `src/hooks/` `src/data/` `src/types/` `src/App.tsx` `src/main.tsx`
+`.claude/` `public/` `vercel.json` `vite.config.ts` `src/hooks/` `src/data/` `src/types/` `src/App.tsx` `src/main.tsx`
+`src/components/` solo se edita para corregir errores de lint (autorizado por el Ingeniero); sin cambios de comportamiento ni de diseño.
 
 ## Zona de trabajo
 `src/utils/evmCalculations.ts`, `src/utils/*.test.ts`, `vitest.config.ts`, y en `package.json` solo el script `test` y la devDependency `vitest`.

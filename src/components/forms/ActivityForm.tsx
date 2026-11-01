@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { X, Save, Plus } from 'lucide-react';
 import { Activity, ActivityCategory, CATEGORY_LABELS } from '../../types';
-import { v4 as uuidv4 } from 'uuid';
+
+// Fecha (YYYY-MM-DD, UTC) de hoy + N días. Mismo cálculo que antes: ahora + N × 24 h.
+const todayPlusDays = (days: number) =>
+  new Date(new Date().getTime() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
 interface ActivityFormProps {
   activity?: Activity;
@@ -15,8 +18,8 @@ export function ActivityForm({ activity, onSave, onCancel, isEditing = false }: 
     wbsCode: activity?.wbsCode || '',
     name: activity?.name || '',
     description: activity?.description || '',
-    plannedStartDate: activity?.plannedStartDate || new Date().toISOString().split('T')[0],
-    plannedEndDate: activity?.plannedEndDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    plannedStartDate: activity?.plannedStartDate || todayPlusDays(0),
+    plannedEndDate: activity?.plannedEndDate || todayPlusDays(7),
     actualStartDate: activity?.actualStartDate || '',
     actualEndDate: activity?.actualEndDate || '',
     plannedCost: activity?.plannedCost || 0,

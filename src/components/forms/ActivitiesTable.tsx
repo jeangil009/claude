@@ -9,7 +9,7 @@ import {
   Filter
 } from 'lucide-react';
 import { Activity, ActivityCategory, CATEGORY_LABELS } from '../../types';
-import { formatCurrency, formatPercent } from '../../utils/evmCalculations';
+import { formatCurrency } from '../../utils/evmCalculations';
 import { ProgressBar } from '../dashboard/ProgressBar';
 
 interface ActivitiesTableProps {
@@ -82,7 +82,7 @@ export function ActivitiesTable({
     }
   };
 
-  const SortIcon = ({ field }: { field: SortField }) => {
+  const renderSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
     return sortOrder === 'asc' ? (
       <ChevronUp className="w-4 h-4" />
@@ -166,7 +166,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1">
                   WBS
-                  <SortIcon field="wbsCode" />
+                  {renderSortIcon("wbsCode")}
                 </div>
               </th>
               <th
@@ -175,7 +175,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1">
                   Actividad
-                  <SortIcon field="name" />
+                  {renderSortIcon("name")}
                 </div>
               </th>
               <th
@@ -184,7 +184,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1">
                   Progreso
-                  <SortIcon field="percentComplete" />
+                  {renderSortIcon("percentComplete")}
                 </div>
               </th>
               <th
@@ -193,7 +193,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1 justify-end">
                   Planificado
-                  <SortIcon field="plannedCost" />
+                  {renderSortIcon("plannedCost")}
                 </div>
               </th>
               <th
@@ -202,7 +202,7 @@ export function ActivitiesTable({
               >
                 <div className="flex items-center gap-1 justify-end">
                   Real
-                  <SortIcon field="actualCost" />
+                  {renderSortIcon("actualCost")}
                 </div>
               </th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">

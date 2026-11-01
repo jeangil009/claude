@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Save, RotateCcw, Download, Upload, Settings } from 'lucide-react';
-import { Project, ProjectStatus, STATUS_LABELS } from '../../types';
+import { Save, RotateCcw, Download, Settings } from 'lucide-react';
+import { Project, STATUS_LABELS } from '../../types';
 import { formatCurrency } from '../../utils/evmCalculations';
 
 interface ProjectSettingsProps {
@@ -15,7 +15,6 @@ export function ProjectSettings({
   project,
   onUpdate,
   onRecalculateBudget,
-  onExport,
   onReset
 }: ProjectSettingsProps) {
   const [formData, setFormData] = useState({

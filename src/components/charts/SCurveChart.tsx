@@ -16,6 +16,46 @@ interface SCurveChartProps {
   currency?: string;
 }
 
+interface TooltipEntry {
+  color?: string;
+  name?: string | number;
+  value?: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipEntry[];
+  label?: string | number;
+  currency: string;
+}
+
+function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+        <p className="font-semibold text-gray-900 mb-2">{label}</p>
+        {payload.map((entry, index) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-gray-600">{entry.name}:</span>
+            <span className="font-medium text-gray-900">
+              {new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0
+              }).format(entry.value ?? 0)}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+}
+
 export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
@@ -25,33 +65,6 @@ export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
       return `$${(value / 1000).toFixed(0)}K`;
     }
     return `$${value}`;
-  };
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-gray-600">{entry.name}:</span>
-              <span className="font-medium text-gray-900">
-                {new Intl.NumberFormat('es-MX', {
-                  style: 'currency',
-                  currency: currency,
-                  minimumFractionDigits: 0
-                }).format(entry.value)}
-              </span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
@@ -93,7 +106,7 @@ export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
               tick={{ fontSize: 12, fill: '#6b7280' }}
               tickLine={{ stroke: '#e5e7eb' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip currency={currency} />} />
             <Legend />
 
             {/* Línea de BAC (Budget at Completion) */}

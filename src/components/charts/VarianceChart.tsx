@@ -17,6 +17,50 @@ interface VarianceChartProps {
   currency?: string;
 }
 
+interface TooltipItem {
+  fullName: string;
+  name: string;
+  variance: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: TooltipItem }>;
+  type: 'cost' | 'schedule';
+  currency: string;
+}
+
+function CustomTooltip({ active, payload, type, currency }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    const item = payload[0].payload;
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+        <p className="font-semibold text-gray-900">{item.fullName}</p>
+        <p className="text-sm text-gray-500">{item.name}</p>
+        <div className="mt-2">
+          <span className="text-sm text-gray-600">
+            {type === 'cost' ? 'Varianza de Costo (CV)' : 'Varianza de Cronograma (SV)'}:
+          </span>
+          <span className={`ml-2 font-bold ${item.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {new Intl.NumberFormat('es-MX', {
+              style: 'currency',
+              currency: currency,
+              minimumFractionDigits: 0
+            }).format(item.variance)}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          {item.variance >= 0
+            ? (type === 'cost' ? 'Bajo presupuesto' : 'Adelantado')
+            : (type === 'cost' ? 'Sobre presupuesto' : 'Retrasado')
+          }
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceChartProps) {
   const data = activities
     .filter(act => act.percentComplete > 0)
@@ -43,37 +87,6 @@ export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceCh
     if (value > 0) return '#10b981'; // green
     if (value < -50000) return '#ef4444'; // red
     return '#f59e0b'; // amber
-  };
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const item = payload[0].payload;
-      return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900">{item.fullName}</p>
-          <p className="text-sm text-gray-500">{item.name}</p>
-          <div className="mt-2">
-            <span className="text-sm text-gray-600">
-              {type === 'cost' ? 'Varianza de Costo (CV)' : 'Varianza de Cronograma (SV)'}:
-            </span>
-            <span className={`ml-2 font-bold ${item.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: currency,
-                minimumFractionDigits: 0
-              }).format(item.variance)}
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            {item.variance >= 0
-              ? (type === 'cost' ? 'Bajo presupuesto' : 'Adelantado')
-              : (type === 'cost' ? 'Sobre presupuesto' : 'Retrasado')
-            }
-          </p>
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
@@ -109,7 +122,7 @@ export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceCh
               tick={{ fontSize: 11, fill: '#6b7280' }}
               width={50}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip type={type} currency={currency} />} />
             <ReferenceLine x={0} stroke="#374151" strokeWidth={2} />
             <Bar dataKey="variance" radius={[0, 4, 4, 0]}>
               {data.map((entry, index) => (
