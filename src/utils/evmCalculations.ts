@@ -322,9 +322,11 @@ export function generateSCurveData(project: Project, periods: number = 12): Char
  * Genera resumen de actividades para reportes
  */
 export function generateActivitySummaries(project: Project): ActivitySummary[] {
+  const asOfDate = new Date();
   return project.activities.map(activity => {
     const ev = calculateEarnedValue(activity);
-    const pv = activity.plannedCost * (activity.percentComplete / 100);
+    // PV real de la actividad a la fecha de corte (antes se igualaba al EV, dejando sv siempre en 0)
+    const pv = calculatePlannedValue({ ...project, activities: [activity] }, asOfDate);
     const cv = ev - activity.actualCost;
     const sv = ev - pv;
     const cpi = activity.actualCost > 0 ? ev / activity.actualCost : 1;
