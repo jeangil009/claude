@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Salida de renders de Manim
+motion/media/
+motion/.venv/
+__pycache__/
