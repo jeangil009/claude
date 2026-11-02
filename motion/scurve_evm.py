@@ -14,11 +14,11 @@ Variables de entorno:
                y si no existe, la fecha de hoy).
 
 Nota sobre EV y AC en el tiempo: el JSON de la app solo trae el acumulado a la
-fecha de corte, no la serie histórica. Si el JSON incluye "history"
-([{"date": "AAAA-MM-DD", "EV": n, "AC": n}, ...]) se usa tal cual; si no, la
-curva se reconstruye por actividad con una rampa lineal entre su inicio real
-(o planificado) y su fin real (o la fecha de corte). Es una estimación y la
-animación lo indica en pantalla.
+fecha de corte, no la serie histórica. Si el proyecto trae cortes registrados
+en la app ("project.history": [{"date": "AAAA-MM-DD", "PV": n, "EV": n, "AC": n}, ...])
+se interpola linealmente entre ellos; si no, la curva se reconstruye por actividad
+con una rampa lineal entre su inicio real (o planificado) y su fin real (o la fecha
+de corte). En ese caso es una estimación y la animación lo indica en pantalla.
 """
 
 import json
@@ -149,13 +149,19 @@ def nice_step(top: float, ticks: int = 5) -> float:
     return 10 * mag
 
 
+def kpi_color(x: float):
+    """Verde si el índice es >= 1, amarillo si >= 0.9, rojo si es menor (mismos cortes que la app)."""
+    return C_EV if x >= 1 else YELLOW_C if x >= 0.9 else C_AC
+
+
 def load_inputs():
     path = Path(os.environ.get("EVM_JSON", HERE / "sample_project.json"))
     data = json.loads(path.read_text(encoding="utf-8"))
     project = data.get("project", data)
     asof_raw = os.environ.get("EVM_ASOF") or data.get("asof")
     asof = d(asof_raw) if asof_raw else date.today()
-    return project, data.get("history"), asof
+    # La app guarda los cortes en project.history; también se acepta "history" en la raíz.
+    return project, data.get("history") or project.get("history"), asof
 
 
 # --------------------------------------------------------------------------
@@ -171,13 +177,25 @@ class EVMSCurve(Scene):
         cur = CURRENCY_SYMBOLS.get(project.get("currency", ""), project.get("currency", ""))
         m = metrics(project, asof)
 
+        n_cuts = 0
         if history:
-            hist = sorted((d(h["date"]), h["EV"], h["AC"]) for h in history)
+            # Cortes reales: (día, EV, AC). Parte de (inicio, 0, 0), ignora cortes posteriores a
+            # la fecha de corte y cierra en la fecha de corte con el avance vigente de las actividades.
+            pts = {0: (0.0, 0.0)}
+            for h in history:
+                day = (d(h["date"]) - start).days
+                if 0 < day <= asof_day:
+                    pts[day] = (float(h["EV"]), float(h["AC"]))
+            n_cuts = len(pts) - 1
+            pts[asof_day] = (m["EV"], m["AC"])
+            knots = sorted((k, v[0], v[1]) for k, v in pts.items())
 
             def ev_ac(day: float):
-                when = start + timedelta(days=day)
-                pts = [h for h in hist if h[0] <= when]
-                return (pts[-1][1], pts[-1][2]) if pts else (0.0, 0.0)
+                for (d0, e0, a0), (d1, e1, a1) in zip(knots, knots[1:]):
+                    if day <= d1:
+                        k = (day - d0) / (d1 - d0)
+                        return e0 + (e1 - e0) * k, a0 + (a1 - a0) * k
+                return knots[-1][1], knots[-1][2]
         else:
             def ev_ac(day: float):
                 return reconstructed(project, asof, start + timedelta(days=int(day)))
@@ -190,6 +208,23 @@ class EVMSCurve(Scene):
         ).next_to(title, DOWN, buff=0.12)
         self.play(Write(title), run_time=1.2)
         self.play(FadeIn(subtitle, shift=UP * 0.1), run_time=0.6)
+
+        # ---- Gancho: el veredicto primero, antes de dibujar nada -----------
+        if all(x == x and abs(x) != float("inf") for x in (m["SPI"], m["CPI"])):
+            def big(value, color, label, detail):
+                num = Text(f"{value:.2f}", font_size=84, weight="BOLD", color=color)
+                head = Text(label, font_size=24, weight="BOLD", color=color)
+                body = Text(detail, font_size=20, color=WHITE)
+                return VGroup(num, head, body).arrange(DOWN, buff=0.2)
+
+            spi_block = big(m["SPI"], kpi_color(m["SPI"]), "SPI · cronograma",
+                            f"ejecutado: {m['SPI'] * 100:.0f}% de lo planificado")
+            cpi_block = big(m["CPI"], kpi_color(m["CPI"]), "CPI · costo",
+                            f"valor ganado por cada {cur} 1 gastado: {m['CPI']:.2f}")
+            hook = VGroup(spi_block, cpi_block).arrange(RIGHT, buff=1.2).move_to(ORIGIN + DOWN * 0.3)
+            self.play(FadeIn(hook, shift=UP * 0.15), run_time=0.7)
+            self.wait(1.2)
+            self.play(FadeOut(hook), run_time=0.4)
 
         # ---- Ejes ---------------------------------------------------------
         y_top = max(m["BAC"], m["EAC"] if m["EAC"] != float("inf") else m["BAC"]) * 1.1
@@ -234,7 +269,7 @@ class EVMSCurve(Scene):
         pv_fn = lambda i: planned_value(project, start + timedelta(days=int(i)))
         pv_curve = polyline(pv_fn, total_days, C_PV)
         pv_tag = Text("PV planificado", font_size=18, color=C_PV).move_to(axes.c2p(total_days * 0.74, m["BAC"] * 0.42))
-        self.play(Create(pv_curve), run_time=3, rate_func=linear)
+        self.play(Create(pv_curve), run_time=2.2, rate_func=linear)
         self.play(FadeIn(pv_tag), run_time=0.4)
 
         # ---- EV y AC avanzando hasta la fecha de corte --------------------
@@ -245,7 +280,7 @@ class EVMSCurve(Scene):
             axes.c2p(t.get_value(), 0), axes.c2p(t.get_value(), y_max),
             color=GREY_B, stroke_width=1.5, dash_length=0.08))
         self.add(ev_curve, ac_curve, cut)
-        self.play(t.animate.set_value(max(asof_day, 1)), run_time=4, rate_func=smooth)
+        self.play(t.animate.set_value(max(asof_day, 1)), run_time=3.2, rate_func=smooth)
         self.remove(ev_curve, ac_curve, cut)
         ev_curve = polyline(lambda i: ev_ac(i)[0], asof_day, C_EV)
         ac_curve = polyline(lambda i: ev_ac(i)[1], asof_day, C_AC)
@@ -262,9 +297,6 @@ class EVMSCurve(Scene):
         self.play(FadeIn(dots), Create(sv_line), Create(cv_line), FadeIn(sv_tag), FadeIn(cv_tag), run_time=1)
 
         # ---- Panel de indicadores ----------------------------------------
-        def kpi_color(x):
-            return C_EV if x >= 1 else YELLOW_C if x >= 0.9 else C_AC
-
         rows = [
             ("PV", money(m["PV"], cur), C_PV), ("EV", money(m["EV"], cur), C_EV),
             ("AC", money(m["AC"], cur), C_AC),
@@ -308,9 +340,11 @@ class EVMSCurve(Scene):
         verdict = Text(f"Salud: {m['health']}", font_size=22, weight="BOLD",
                        color=C_EV if m["health"] in ("excelente", "buena") else YELLOW_C if m["health"] == "en alerta" else C_AC)
         verdict.move_to(panel.get_bottom() + UP * 0.38)
-        note = None
-        if not history:
-            note = Text("EV y AC reconstruidos por actividad (estimación)", font_size=18, color=GREY_B).to_edge(DOWN, buff=0.15)
-        self.play(FadeIn(verdict, shift=UP * 0.1), *( [FadeIn(note)] if note else [] ), run_time=0.8)
-        self.wait(2.5)
+        if history:
+            msg = f"EV y AC: {n_cuts} cortes registrados, interpolación lineal entre cortes"
+        else:
+            msg = "EV y AC reconstruidos por actividad (estimación)"
+        note = Text(msg, font_size=18, color=GREY_B).to_edge(DOWN, buff=0.15)
+        self.play(FadeIn(verdict, shift=UP * 0.1), FadeIn(note), run_time=0.8)
+        self.wait(2.0)
         self.play(*[FadeOut(mob) for mob in self.mobjects], run_time=0.8)

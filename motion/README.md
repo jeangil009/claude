@@ -43,13 +43,23 @@ Con `--format=gif` o `-t` (fondo transparente) se obtienen otros formatos.
 - `project`: mismo esquema que el JSON de la app (actividades, fechas, costos, % de avance).
 - `asof` (opcional): fecha de corte AAAA-MM-DD. Se puede sobrescribir con `EVM_ASOF`.
   Si no existe ninguna, se usa la fecha de hoy.
-- `history` (opcional): `[{"date": "AAAA-MM-DD", "EV": n, "AC": n}, ...]` con los acumulados
-  reales por periodo. Úsalo cuando tengas los valores de cada corte mensual.
+- Cortes de avance (`project.history`): `[{"date": "AAAA-MM-DD", "PV": n, "EV": n, "AC": n}, ...]`.
+  La app los genera con el botón **Guardar corte** (Configuración → Cortes de Avance) y los
+  incluye en el JSON exportado. También se acepta `history` en la raíz del JSON.
 
-Limitación importante: el JSON de la app solo guarda EV y AC acumulados a la fecha de corte,
-no su historia. Sin `history`, las curvas EV y AC se reconstruyen por actividad con una
-rampa lineal entre su inicio real (o planificado) y su fin real (o la fecha de corte).
-Es una estimación y la animación lo indica en pantalla. Para reportes formales, usa `history`.
+Cómo se dibujan EV y AC:
+
+- **Con cortes:** se interpola linealmente entre ellos, partiendo de (inicio, 0, 0) y cerrando en
+  la fecha de corte con el avance vigente de las actividades. Los cortes posteriores a la fecha
+  de corte se ignoran. El pie del video indica cuántos cortes se usaron.
+- **Sin cortes:** el JSON solo trae EV y AC acumulados a la fecha de corte, así que se
+  reconstruyen por actividad con una rampa lineal entre su inicio real (o planificado) y su fin
+  real (o la fecha de corte). Es una estimación y el video lo indica en pantalla.
+
+Para un informe formal, registra un corte en cada fecha de informe, después de actualizar el
+avance y el costo real de las actividades: un corte guarda lo que las actividades tengan en ese
+momento. `sample_project_con_cortes.json` es un ejemplo de demostración con cortes generados
+por script (no son mediciones reales).
 
 ## Convenciones
 
