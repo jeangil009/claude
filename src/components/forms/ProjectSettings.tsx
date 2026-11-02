@@ -244,6 +244,7 @@ export function ProjectSettings({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
+                <option value="PAB">PAB - Balboa Panameño (B/.)</option>
                 <option value="MXN">MXN - Peso Mexicano</option>
                 <option value="USD">USD - Dólar Estadounidense</option>
                 <option value="EUR">EUR - Euro</option>

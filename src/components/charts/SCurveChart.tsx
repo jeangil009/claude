@@ -10,6 +10,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { ChartDataPoint } from '../../types';
+import { currencyLocale } from '../../utils/evmCalculations';
 
 interface SCurveChartProps {
   data: ChartDataPoint[];
@@ -40,7 +41,7 @@ export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
               />
               <span className="text-gray-600">{entry.name}:</span>
               <span className="font-medium text-gray-900">
-                {new Intl.NumberFormat('es-MX', {
+                {new Intl.NumberFormat(currencyLocale(currency), {
                   style: 'currency',
                   currency: currency,
                   minimumFractionDigits: 0

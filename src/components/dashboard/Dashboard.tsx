@@ -251,6 +251,7 @@ export function Dashboard({
             { label: 'Presupuesto (BAC)', value: metrics.BAC, color: 'bg-gray-400' }
           ]}
           max={metrics.BAC}
+          currency={project.currency}
         />
       </div>
 

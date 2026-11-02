@@ -1,3 +1,5 @@
+import { formatCurrency } from '../../utils/evmCalculations';
+
 interface ProgressBarProps {
   value: number;
   max?: number;
@@ -72,9 +74,10 @@ interface ComparisonBarsProps {
     color: string;
   }[];
   max: number;
+  currency?: string;
 }
 
-export function ComparisonBars({ items, max }: ComparisonBarsProps) {
+export function ComparisonBars({ items, max, currency = 'MXN' }: ComparisonBarsProps) {
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
@@ -82,11 +85,7 @@ export function ComparisonBars({ items, max }: ComparisonBarsProps) {
           <div className="flex justify-between items-center mb-1">
             <span className="text-sm font-medium text-gray-700">{item.label}</span>
             <span className="text-sm text-gray-500">
-              {new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: 'MXN',
-                minimumFractionDigits: 0
-              }).format(item.value)}
+              {formatCurrency(item.value, currency)}
             </span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">

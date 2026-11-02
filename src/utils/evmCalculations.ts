@@ -494,10 +494,18 @@ export function generateRecommendations(metrics: EVMMetrics): string[] {
 }
 
 /**
+ * Idioma de formato según la moneda: con es-PA el balboa se muestra como "B/. 1,234"
+ * (con es-MX saldría "PAB 1,234"). El resto de monedas conserva es-MX.
+ */
+export function currencyLocale(currency: string): string {
+  return currency === 'PAB' ? 'es-PA' : 'es-MX';
+}
+
+/**
  * Formatea un número como moneda
  */
 export function formatCurrency(value: number, currency: string = 'MXN'): string {
-  return new Intl.NumberFormat('es-MX', {
+  return new Intl.NumberFormat(currencyLocale(currency), {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,

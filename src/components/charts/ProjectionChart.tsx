@@ -10,6 +10,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { EVMMetrics } from '../../types';
+import { currencyLocale } from '../../utils/evmCalculations';
 
 interface ProjectionChartProps {
   metrics: EVMMetrics;
@@ -33,7 +34,7 @@ export function ProjectionChart({ metrics, currency = 'MXN' }: ProjectionChartPr
   ];
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('es-MX', {
+    return new Intl.NumberFormat(currencyLocale(currency), {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 0,

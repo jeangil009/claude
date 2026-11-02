@@ -10,6 +10,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { ActivitySummary } from '../../types';
+import { currencyLocale } from '../../utils/evmCalculations';
 
 interface VarianceChartProps {
   activities: ActivitySummary[];
@@ -57,7 +58,7 @@ export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceCh
               {type === 'cost' ? 'Varianza de Costo (CV)' : 'Varianza de Cronograma (SV)'}:
             </span>
             <span className={`ml-2 font-bold ${item.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {new Intl.NumberFormat('es-MX', {
+              {new Intl.NumberFormat(currencyLocale(currency), {
                 style: 'currency',
                 currency: currency,
                 minimumFractionDigits: 0
