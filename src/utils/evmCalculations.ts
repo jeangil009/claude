@@ -444,8 +444,13 @@ export function generateRecommendations(metrics: EVMMetrics): string[] {
 /**
  * Formatea un número como moneda
  */
-export function formatCurrency(value: number, currency: string = 'MXN'): string {
-  return new Intl.NumberFormat('es-MX', {
+export const DEFAULT_CURRENCY = 'USD';
+
+// Locale panameño: punto decimal, coma de miles. Con USD imprime "USD 1,234".
+const CURRENCY_LOCALE = 'es-PA';
+
+export function formatCurrency(value: number, currency: string = DEFAULT_CURRENCY): string {
+  return new Intl.NumberFormat(CURRENCY_LOCALE, {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,

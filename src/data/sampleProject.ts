@@ -297,8 +297,8 @@ export const sampleProject: Project = {
   location: 'Fracc. Los Pinos, Guadalajara, Jalisco',
   startDate: '2024-01-15',
   plannedEndDate: '2024-08-20',
-  budget: 5070000, // $5,070,000 MXN
-  currency: 'MXN',
+  budget: 5070000, // USD 5,070,000 (cifras de ejemplo, sin convertir)
+  currency: 'USD',
   status: 'en_progreso',
   activities: sampleActivities
 };
@@ -314,7 +314,7 @@ export function createEmptyProject(): Project {
     startDate: new Date().toISOString().split('T')[0],
     plannedEndDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     budget: 0,
-    currency: 'MXN',
+    currency: 'USD',
     status: 'planificacion',
     activities: []
   };

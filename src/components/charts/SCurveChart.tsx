@@ -10,6 +10,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { ChartDataPoint } from '../../types';
+import { DEFAULT_CURRENCY, formatCurrency as formatMoney } from '../../utils/evmCalculations';
 
 interface SCurveChartProps {
   data: ChartDataPoint[];
@@ -42,11 +43,7 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
             />
             <span className="text-gray-600">{entry.name}:</span>
             <span className="font-medium text-gray-900">
-              {new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: currency,
-                minimumFractionDigits: 0
-              }).format(entry.value ?? 0)}
+              {formatMoney(entry.value ?? 0, currency)}
             </span>
           </div>
         ))}
@@ -56,7 +53,7 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
   return null;
 }
 
-export function SCurveChart({ data, currency = 'MXN' }: SCurveChartProps) {
+export function SCurveChart({ data, currency = DEFAULT_CURRENCY }: SCurveChartProps) {
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
       return `$${(value / 1000000).toFixed(1)}M`;

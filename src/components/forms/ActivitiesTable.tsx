@@ -9,7 +9,7 @@ import {
   Filter
 } from 'lucide-react';
 import { Activity, ActivityCategory, CATEGORY_LABELS } from '../../types';
-import { formatCurrency } from '../../utils/evmCalculations';
+import { DEFAULT_CURRENCY, formatCurrency } from '../../utils/evmCalculations';
 import { ProgressBar } from '../dashboard/ProgressBar';
 
 interface ActivitiesTableProps {
@@ -18,6 +18,7 @@ interface ActivitiesTableProps {
   onDelete: (activityId: string) => void;
   onAdd: () => void;
   onUpdateProgress: (activityId: string, percentComplete: number, actualCost: number) => void;
+  currency?: string;
 }
 
 type SortField = 'wbsCode' | 'name' | 'percentComplete' | 'plannedCost' | 'actualCost';
@@ -28,7 +29,8 @@ export function ActivitiesTable({
   onEdit,
   onDelete,
   onAdd,
-  onUpdateProgress
+  onUpdateProgress,
+  currency = DEFAULT_CURRENCY
 }: ActivitiesTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<ActivityCategory | 'all'>('all');
@@ -260,7 +262,7 @@ export function ActivitiesTable({
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-sm text-gray-900">
-                      {formatCurrency(activity.plannedCost)}
+                      {formatCurrency(activity.plannedCost, currency)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -274,13 +276,13 @@ export function ActivitiesTable({
                       />
                     ) : (
                       <span className={`text-sm font-medium ${getVarianceColor(activity.plannedCost, activity.actualCost)}`}>
-                        {formatCurrency(activity.actualCost)}
+                        {formatCurrency(activity.actualCost, currency)}
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-sm text-green-600 font-medium">
-                      {formatCurrency(ev)}
+                      {formatCurrency(ev, currency)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -358,13 +360,13 @@ export function ActivitiesTable({
             <div>
               <span className="text-gray-500">Total Planificado:</span>
               <span className="ml-2 font-semibold text-gray-900">
-                {formatCurrency(sortedActivities.reduce((sum, a) => sum + a.plannedCost, 0))}
+                {formatCurrency(sortedActivities.reduce((sum, a) => sum + a.plannedCost, 0), currency)}
               </span>
             </div>
             <div>
               <span className="text-gray-500">Total Real:</span>
               <span className="ml-2 font-semibold text-gray-900">
-                {formatCurrency(sortedActivities.reduce((sum, a) => sum + a.actualCost, 0))}
+                {formatCurrency(sortedActivities.reduce((sum, a) => sum + a.actualCost, 0), currency)}
               </span>
             </div>
           </div>

@@ -9,8 +9,12 @@ Comando único de prueba:
 Rama: `claude/new-session-k42o7l` · Nunca push a main · Sin deploys · Entrega: 07:00 (hora de Panamá)
 
 ## Intocables
-`.claude/` `public/` `vercel.json` `vite.config.ts` `src/hooks/` `src/data/` `src/types/` `src/App.tsx` `src/main.tsx`
-`src/components/` solo se edita para corregir errores de lint (autorizado por el Ingeniero); sin cambios de comportamiento ni de diseño.
+`.claude/` `public/` `vercel.json` `vite.config.ts` `src/types/` `src/main.tsx`
+`src/components/`, `src/hooks/`, `src/data/` y `src/App.tsx` solo se editan para la tarea autorizada vigente (ver abajo), sin cambios de diseño.
+
+## Tareas autorizadas por el Ingeniero
+1. Limpieza de los 27 errores de lint (hecha).
+2. Moneda USD en toda la app y persistencia del proyecto en localStorage (en curso; USD con locale es-PA, formato `USD 1,234`).
 
 ## Zona de trabajo
 `src/utils/evmCalculations.ts`, `src/utils/*.test.ts`, `vitest.config.ts`, y en `package.json` solo el script `test` y la devDependency `vitest`.

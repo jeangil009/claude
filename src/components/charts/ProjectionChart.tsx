@@ -1,11 +1,12 @@
 import { EVMMetrics } from '../../types';
+import { DEFAULT_CURRENCY, formatCurrency as formatMoney } from '../../utils/evmCalculations';
 
 interface ProjectionChartProps {
   metrics: EVMMetrics;
   currency?: string;
 }
 
-export function ProjectionChart({ metrics, currency = 'MXN' }: ProjectionChartProps) {
+export function ProjectionChart({ metrics, currency = DEFAULT_CURRENCY }: ProjectionChartProps) {
   // Datos para la gráfica de comparación de EAC
   const eacComparison = [
     { name: 'BAC Original', value: metrics.BAC, color: '#3b82f6' },
@@ -14,14 +15,7 @@ export function ProjectionChart({ metrics, currency = 'MXN' }: ProjectionChartPr
     { name: 'EAC Combinado', value: metrics.EAC_combined, color: '#8b5cf6' },
   ];
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
-  };
+  const formatCurrency = (value: number) => formatMoney(value, currency);
 
   const formatCompact = (value: number) => {
     if (value >= 1000000) {

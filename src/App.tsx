@@ -96,6 +96,7 @@ function App() {
             onDelete={handleDeleteActivity}
             onAdd={handleAddActivity}
             onUpdateProgress={updateActivityProgress}
+            currency={project.currency}
           />
         )}
 

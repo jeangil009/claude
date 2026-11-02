@@ -1,6 +1,6 @@
 # Requisitos → tests
 
-Comando: `npx vitest run` (archivo: `src/utils/evmCalculations.test.ts`)
+Comando: `npx vitest run` (archivos: `src/utils/*.test.ts`)
 Estado: pendiente | verde | rojo | bloqueado. "Prueba" = salida real pegada en night-log.md.
 
 | id | requisito | test (describe) | estado | prueba |
@@ -23,3 +23,9 @@ Estado: pendiente | verde | rojo | bloqueado. "Prueba" = salida real pegada en n
 | R16 | calculateAllEVMMetrics coherente (identidades VAC, ETC, % ) | R16 métricas | verde | vitest 45/45 (night-log) |
 | R17 | Resumen de actividad: sv = EV − PV real de la actividad (sospecha 1) | R17 resúmenes | verde | rojo→verde; Checker + test extra, 45/45 |
 | R18 | analyzeTrends: días restantes en días, no puntos porcentuales (sospecha 2) | R18 tendencias | parcial / BLOQUEADO | invariantes verdes; la corrección de unidades exige cambio de firma (ver night-log) |
+| R19 | formatCurrency: USD por defecto, locale es-PA, sin decimales, respeta otra moneda | R19 formatCurrency USD | pendiente | — |
+| R20 | Datos de ejemplo y proyecto vacío usan USD | R20 monedas por defecto | pendiente | — |
+| R21 | Persistencia: guardar y cargar devuelve el mismo proyecto, con sobre versionado | R21 persistencia ida y vuelta | pendiente | — |
+| R22 | Persistencia: datos corruptos, versión distinta o forma inválida → null (nunca lanza) | R22 persistencia datos inválidos | pendiente | — |
+| R23 | Persistencia: storage que falla o inexistente → no lanza; save devuelve false | R23 persistencia tolerante a fallos | pendiente | — |
+| R24 | UI: editar → recargar conserva el cambio; "Restaurar datos de ejemplo" vuelve al ejemplo; todo en USD | verificación en navegador (Checker) | pendiente | — |

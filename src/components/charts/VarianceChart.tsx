@@ -10,6 +10,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { ActivitySummary } from '../../types';
+import { DEFAULT_CURRENCY, formatCurrency as formatMoney } from '../../utils/evmCalculations';
 
 interface VarianceChartProps {
   activities: ActivitySummary[];
@@ -42,11 +43,7 @@ function CustomTooltip({ active, payload, type, currency }: CustomTooltipProps) 
             {type === 'cost' ? 'Varianza de Costo (CV)' : 'Varianza de Cronograma (SV)'}:
           </span>
           <span className={`ml-2 font-bold ${item.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {new Intl.NumberFormat('es-MX', {
-              style: 'currency',
-              currency: currency,
-              minimumFractionDigits: 0
-            }).format(item.variance)}
+            {formatMoney(item.variance, currency)}
           </span>
         </div>
         <p className="text-xs text-gray-500 mt-1">
@@ -61,7 +58,7 @@ function CustomTooltip({ active, payload, type, currency }: CustomTooltipProps) 
   return null;
 }
 
-export function VarianceChart({ activities, type, currency = 'MXN' }: VarianceChartProps) {
+export function VarianceChart({ activities, type, currency = DEFAULT_CURRENCY }: VarianceChartProps) {
   const data = activities
     .filter(act => act.percentComplete > 0)
     .map(act => ({

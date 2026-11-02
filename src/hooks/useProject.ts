@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Project, Activity, EVMMetrics, ChartDataPoint, ActivitySummary, TrendAnalysis } from '../types';
 import {
   calculateAllEVMMetrics,
@@ -8,11 +8,18 @@ import {
   generateRecommendations
 } from '../utils/evmCalculations';
 import { sampleProject } from '../data/sampleProject';
+import { clearStoredProject, loadProject, saveProject } from '../utils/projectStorage';
 import { v4 as uuidv4 } from 'uuid';
 
 export function useProject() {
-  const [project, setProject] = useState<Project>(sampleProject);
+  // Carga el proyecto guardado en el navegador; si no hay (o está dañado), usa el ejemplo
+  const [project, setProject] = useState<Project>(() => loadProject() ?? sampleProject);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Guardar automáticamente cada cambio del proyecto
+  useEffect(() => {
+    saveProject(project);
+  }, [project]);
 
   // Calcular métricas EVM
   const metrics: EVMMetrics = useMemo(() => {
@@ -120,6 +127,7 @@ export function useProject() {
 
   // Reiniciar a datos de ejemplo
   const resetToSampleData = useCallback(() => {
+    clearStoredProject();
     setProject(sampleProject);
   }, []);
 
