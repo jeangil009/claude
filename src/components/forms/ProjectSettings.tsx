@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Save, RotateCcw, Download, Upload, Settings } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { format } from 'date-fns';
+import { Save, RotateCcw, Download, Upload, Settings, Camera, Trash2 } from 'lucide-react';
 import { Project, ProjectStatus, STATUS_LABELS } from '../../types';
 import { formatCurrency } from '../../utils/evmCalculations';
 
@@ -9,6 +10,9 @@ interface ProjectSettingsProps {
   onRecalculateBudget: () => void;
   onExport: () => void;
   onReset: () => void;
+  onSaveSnapshot: (date: string) => void;
+  onDeleteSnapshot: (date: string) => void;
+  onImport: (data: unknown) => Project | null;
 }
 
 export function ProjectSettings({
@@ -16,8 +20,15 @@ export function ProjectSettings({
   onUpdate,
   onRecalculateBudget,
   onExport,
-  onReset
+  onReset,
+  onSaveSnapshot,
+  onDeleteSnapshot,
+  onImport
 }: ProjectSettingsProps) {
+  const [snapshotDate, setSnapshotDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [importMessage, setImportMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState({
     name: project.name,
     description: project.description,
@@ -46,6 +57,35 @@ export function ProjectSettings({
   const handleSave = () => {
     onUpdate(formData);
     setHasChanges(false);
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const imported = onImport(JSON.parse(await file.text()));
+      if (imported) {
+        // El formulario toma su estado inicial una sola vez: refrescarlo con lo importado
+        setFormData({
+          name: imported.name,
+          description: imported.description,
+          client: imported.client,
+          location: imported.location,
+          startDate: imported.startDate,
+          plannedEndDate: imported.plannedEndDate,
+          budget: imported.budget,
+          currency: imported.currency,
+          status: imported.status
+        });
+        setHasChanges(false);
+        setImportMessage('Proyecto importado correctamente.');
+      } else {
+        setImportMessage('El archivo no tiene el formato de proyecto esperado.');
+      }
+    } catch {
+      setImportMessage('No se pudo leer el archivo JSON.');
+    }
+    e.target.value = '';
   };
 
   const handleExportJSON = () => {
@@ -288,6 +328,78 @@ export function ProjectSettings({
         </div>
       </div>
 
+      {/* Cortes de avance */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-gray-100 rounded-lg">
+            <Camera className="w-5 h-5 text-gray-600" />
+          </div>
+          <h3 className="font-semibold text-gray-900 text-lg">Cortes de Avance</h3>
+        </div>
+        <p className="text-sm text-gray-500 mb-4">
+          Un corte guarda PV, EV y AC acumulados a una fecha, con el avance y costo real que tengan
+          las actividades en este momento. Registre un corte en cada fecha de informe: con ellos la
+          Curva S y la animación usan datos reales en lugar de una aproximación.
+        </p>
+        <div className="flex flex-wrap items-end gap-3 mb-4">
+          <div>
+            <label htmlFor="snapshot-date" className="block text-sm font-medium text-gray-700 mb-1">Fecha del corte</label>
+            <input
+              id="snapshot-date"
+              type="date"
+              value={snapshotDate}
+              onChange={e => setSnapshotDate(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <button
+            onClick={() => snapshotDate && onSaveSnapshot(snapshotDate)}
+            disabled={!snapshotDate}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
+          >
+            <Camera className="w-4 h-4" />
+            Guardar corte
+          </button>
+        </div>
+
+        {(project.history ?? []).length === 0 ? (
+          <p className="text-sm text-gray-500">Aún no hay cortes registrados.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm" data-testid="snapshots-table">
+              <thead>
+                <tr className="text-left text-gray-500 border-b border-gray-200">
+                  <th className="py-2 pr-4">Fecha</th>
+                  <th className="py-2 pr-4 text-right">PV</th>
+                  <th className="py-2 pr-4 text-right">EV</th>
+                  <th className="py-2 pr-4 text-right">AC</th>
+                  <th className="py-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {(project.history ?? []).map(h => (
+                  <tr key={h.date} className="border-b border-gray-100">
+                    <td className="py-2 pr-4 font-medium text-gray-900">{h.date}</td>
+                    <td className="py-2 pr-4 text-right">{formatCurrency(h.PV, project.currency)}</td>
+                    <td className="py-2 pr-4 text-right">{formatCurrency(h.EV, project.currency)}</td>
+                    <td className="py-2 pr-4 text-right">{formatCurrency(h.AC, project.currency)}</td>
+                    <td className="py-2 text-right">
+                      <button
+                        onClick={() => onDeleteSnapshot(h.date)}
+                        aria-label={`Eliminar corte ${h.date}`}
+                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       {/* Acciones de datos */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <h3 className="font-semibold text-gray-900 mb-4">Gestión de Datos</h3>
@@ -301,6 +413,22 @@ export function ProjectSettings({
           </button>
 
           <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            Importar Proyecto (JSON)
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportFile}
+            className="hidden"
+            data-testid="import-input"
+          />
+
+          <button
             onClick={onReset}
             className="flex items-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-colors"
           >
@@ -308,8 +436,12 @@ export function ProjectSettings({
             Restaurar Datos de Ejemplo
           </button>
         </div>
+        {importMessage && (
+          <p className="text-sm text-blue-700 mt-3" role="status">{importMessage}</p>
+        )}
         <p className="text-sm text-gray-500 mt-3">
-          Nota: Los datos se almacenan localmente en el navegador. Exporte regularmente para mantener un respaldo.
+          Nota: Los datos se guardan en este navegador (almacenamiento local) y se pierden si borra los datos del sitio.
+          Exporte regularmente para mantener un respaldo.
         </p>
       </div>
     </div>

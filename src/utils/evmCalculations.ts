@@ -12,7 +12,8 @@ import {
   ProjectHealth,
   ChartDataPoint,
   ActivitySummary,
-  TrendAnalysis
+  TrendAnalysis,
+  ProgressSnapshot
 } from '../types';
 import { differenceInDays, parseISO, format, addDays, isAfter, isBefore } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -275,7 +276,53 @@ export function calculateAllEVMMetrics(project: Project, asOfDate: Date = new Da
 }
 
 /**
+ * Crea un corte de avance con los valores acumulados del proyecto a una fecha.
+ * EV y AC salen del avance y costo real vigentes en las actividades; PV se calcula a la fecha.
+ */
+export function createSnapshot(project: Project, asOfDate: Date): ProgressSnapshot {
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  return {
+    date: format(asOfDate, 'yyyy-MM-dd'),
+    PV: round2(calculatePlannedValue(project, asOfDate)),
+    EV: round2(calculateTotalEarnedValue(project)),
+    AC: round2(calculateTotalActualCost(project))
+  };
+}
+
+/**
+ * EV y AC a una fecha, interpolando linealmente entre cortes registrados.
+ * Parte de (inicio del proyecto, 0, 0). Devuelve null después del último corte.
+ */
+function valuesFromHistory(
+  startDate: Date,
+  history: ProgressSnapshot[],
+  when: Date
+): { EV: number; AC: number } | null {
+  const points = [
+    { t: startDate.getTime(), EV: 0, AC: 0 },
+    ...history
+      .map(h => ({ t: parseISO(h.date).getTime(), EV: h.EV, AC: h.AC }))
+      .filter(p => p.t > startDate.getTime())
+      .sort((a, b) => a.t - b.t)
+  ];
+  const x = when.getTime();
+  if (x > points[points.length - 1].t) return null;
+  for (let i = 1; i < points.length; i++) {
+    if (x <= points[i].t) {
+      const a = points[i - 1];
+      const b = points[i];
+      const k = (x - a.t) / (b.t - a.t);
+      return { EV: a.EV + (b.EV - a.EV) * k, AC: a.AC + (b.AC - a.AC) * k };
+    }
+  }
+  return null;
+}
+
+/**
  * Genera datos para la gráfica de Curva S
+ *
+ * Con cortes de avance (project.history) usa los valores reales registrados.
+ * Sin ellos, mantiene la aproximación lineal anterior.
  */
 export function generateSCurveData(project: Project, periods: number = 12): ChartDataPoint[] {
   const startDate = parseISO(project.startDate);
@@ -292,23 +339,27 @@ export function generateSCurveData(project: Project, periods: number = 12): Char
     // Para EV y AC, usamos los valores reales hasta la fecha actual
     // y proyectamos para fechas futuras
     const today = new Date();
-    let ev = 0;
-    let ac = 0;
+    let ev: number | null = 0;
+    let ac: number | null = 0;
 
-    if (isBefore(currentDate, today) || currentDate.getTime() === today.getTime()) {
+    if (project.history && project.history.length > 0) {
+      const real = valuesFromHistory(startDate, project.history, currentDate);
+      ev = real ? real.EV : null;
+      ac = real ? real.AC : null;
+    } else if (isBefore(currentDate, today) || currentDate.getTime() === today.getTime()) {
       ev = calculateTotalEarnedValue(project) * (i / periods);
       ac = calculateTotalActualCost(project) * (i / periods);
     }
 
-    const cpi = ac > 0 ? ev / ac : 1;
-    const spi = pv > 0 ? ev / pv : 1;
+    const cpi = ev !== null && ac !== null && ac > 0 ? ev / ac : 1;
+    const spi = ev !== null && pv > 0 ? ev / pv : 1;
 
     data.push({
       period: `P${i}`,
       date: format(currentDate, 'dd/MM/yyyy', { locale: es }),
       PV: Math.round(pv),
-      EV: Math.round(ev),
-      AC: Math.round(ac),
+      EV: ev === null ? null : Math.round(ev),
+      AC: ac === null ? null : Math.round(ac),
       BAC: project.budget,
       CPI: Number(cpi.toFixed(2)),
       SPI: Number(spi.toFixed(2))
@@ -351,10 +402,13 @@ export function analyzeTrends(
   currentMetrics: EVMMetrics,
   historicalData: ChartDataPoint[]
 ): TrendAnalysis {
+  // Solo períodos con datos reales (EV/AC no nulos) cuentan para la tendencia
+  const observed = historicalData.filter(d => d.EV !== null && d.AC !== null);
+
   // Analizar tendencia del CPI
   let cpiTrend: 'improving' | 'stable' | 'declining' = 'stable';
-  if (historicalData.length >= 3) {
-    const recentCPIs = historicalData.slice(-3).map(d => d.CPI);
+  if (observed.length >= 3) {
+    const recentCPIs = observed.slice(-3).map(d => d.CPI);
     const cpiChange = recentCPIs[2] - recentCPIs[0];
     if (cpiChange > 0.05) cpiTrend = 'improving';
     else if (cpiChange < -0.05) cpiTrend = 'declining';
@@ -362,8 +416,8 @@ export function analyzeTrends(
 
   // Analizar tendencia del SPI
   let spiTrend: 'improving' | 'stable' | 'declining' = 'stable';
-  if (historicalData.length >= 3) {
-    const recentSPIs = historicalData.slice(-3).map(d => d.SPI);
+  if (observed.length >= 3) {
+    const recentSPIs = observed.slice(-3).map(d => d.SPI);
     const spiChange = recentSPIs[2] - recentSPIs[0];
     if (spiChange > 0.05) spiTrend = 'improving';
     else if (spiChange < -0.05) spiTrend = 'declining';

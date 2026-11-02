@@ -21,8 +21,18 @@ function App() {
     deleteActivity,
     updateActivityProgress,
     recalculateBudget,
+    saveSnapshot,
+    deleteSnapshot,
+    importProjectData,
     resetToSampleData
   } = useProject();
+
+  // Reinicia el formulario de configuración cuando se restauran los datos de ejemplo
+  const [settingsKey, setSettingsKey] = useState(0);
+  const handleReset = () => {
+    resetToSampleData();
+    setSettingsKey(k => k + 1);
+  };
 
   const [currentView, setCurrentView] = useState('dashboard');
   const [showActivityForm, setShowActivityForm] = useState(false);
@@ -101,11 +111,15 @@ function App() {
 
         {currentView === 'settings' && (
           <ProjectSettings
+            key={settingsKey}
             project={project}
             onUpdate={updateProject}
             onRecalculateBudget={recalculateBudget}
             onExport={handleExport}
-            onReset={resetToSampleData}
+            onReset={handleReset}
+            onSaveSnapshot={saveSnapshot}
+            onDeleteSnapshot={deleteSnapshot}
+            onImport={importProjectData}
           />
         )}
       </main>

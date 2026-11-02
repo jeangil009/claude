@@ -28,6 +28,14 @@ export type ActivityCategory =
   | 'pintura'
   | 'otros';
 
+// Corte de avance: valores acumulados del proyecto a una fecha (historial real)
+export interface ProgressSnapshot {
+  date: string; // AAAA-MM-DD
+  PV: number;
+  EV: number;
+  AC: number;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -41,6 +49,7 @@ export interface Project {
   currency: string;
   status: ProjectStatus;
   activities: Activity[];
+  history?: ProgressSnapshot[]; // cortes de avance guardados por el usuario
 }
 
 export type ProjectStatus = 'planificacion' | 'en_progreso' | 'pausado' | 'completado' | 'cancelado';
@@ -91,8 +100,8 @@ export interface ChartDataPoint {
   period: string;
   date: string;
   PV: number;
-  EV: number;
-  AC: number;
+  EV: number | null; // null = aún sin corte registrado (no se dibuja)
+  AC: number | null;
   BAC: number;
   CPI: number;
   SPI: number;
