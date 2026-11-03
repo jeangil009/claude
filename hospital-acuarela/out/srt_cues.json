@@ -1,0 +1,32 @@
+[
+ {
+  "t0": 0.85,
+  "t1": 5.3,
+  "text": "Antes de cuidar a nadie, un hospital es solo un terreno vacío."
+ },
+ {
+  "t0": 7.85,
+  "t1": 12.85,
+  "text": "Primero se estudia el suelo, y se excava hasta encontrar terreno firme."
+ },
+ {
+  "t0": 16.85,
+  "t1": 22.76,
+  "text": "Sobre esa base se levanta el esqueleto: columnas, vigas y losas, piso por piso."
+ },
+ {
+  "t0": 26.45,
+  "t1": 33.91,
+  "text": "Después se cierran los muros. Y por dentro corre lo invisible: agua, electricidad, oxígeno y aire limpio."
+ },
+ {
+  "t0": 37.85,
+  "t1": 41.58,
+  "text": "Al final llegan los pisos, las camas, los equipos."
+ },
+ {
+  "t0": 42.25,
+  "t1": 47.64,
+  "text": "Cuando se enciende la primera luz, la obra termina. Y empieza lo importante."
+ }
+]

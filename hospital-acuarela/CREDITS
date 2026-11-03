@@ -1,0 +1,11 @@
+Cómo nace un hospital — créditos de terceros
+
+Imagen: motor de trazos de acuarela (engine.js) y generador de papel (paper.py) adaptados de la biblioteca Lemo-Opuscar, licencia MIT (https://github.com/lemomo-ai/lemo-opuscar). Todo lo demás (escena, edificio, sala, cámara) está escrito para esta película.
+Tipografías (Google Fonts, SIL Open Font License 1.1): Cormorant Garamond, Caveat, IBM Plex Mono.
+Música: partitura original interpretada con muestras.
+  Piano: "Salamander Grand Piano V3" de Alexander Holm, licencia CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+  Arpa, glockenspiel y vibráfono: Versilian Community Sample Library (Versilian Studios), CC0 1.0
+  Kalimba y guitarra de nailon: síntesis física propia (core/audio/pluck.py), sin licencia asociada.
+Efectos y ambiente: sintetizados con numpy/scipy (core/audio/sfx.py), sin muestras externas.
+Voz: Kokoro v1.0 (kokoro-onnx, modelo Kokoro-82M, licencia Apache 2.0), voz "ef_dora", español. Audio generado por síntesis; no verificado con transcripción automática (el servidor de modelos de Whisper no estaba accesible).
+El hospital, la bandera y la habitación son ficticios: no representan ningún proyecto, marca ni entidad real.
