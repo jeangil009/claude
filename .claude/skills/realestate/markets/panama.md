@@ -46,8 +46,8 @@ El modo `--us` fuerza el modo EE.UU. Si hay ambigüedad (por ejemplo "Panama Cit
 
 | Concepto | Valor de referencia | Confianza |
 |---|---|---|
-| Impuesto de Transferencia de Bienes Inmuebles (ITBI) | 2% sobre el mayor entre precio de venta y valor registrado/catastral. Lo paga el vendedor por convención. | [M] |
-| Ganancia de capital (vendedor) | 10% sobre la ganancia; en la práctica se anticipa un 3% del precio de venta y luego se ajusta. | [M] |
+| Impuesto de Transferencia de Bienes Inmuebles (ITBI) | 2% sobre el mayor entre precio de venta y valor registrado/catastral. Lo paga el vendedor por convención. La Ley 546 de 2026 (reportada por prensa, confirmar en Gaceta Oficial) exonera el ITBI de los primeros USD 120,000 en la primera venta de vivienda nueva; no aplica a reventas. | [M] |
+| Ganancia de capital (vendedor) | 10% sobre la ganancia; en la práctica se anticipa un 3% del precio de venta y luego se ajusta (Ley 18 de 2006; formularios DGI 106 y 107). Si no hay ganancia, el contribuyente puede pedir la devolución del anticipo con una declaración especial. No se verificó si ITBI, comisión y mejoras son deducibles de la ganancia. | [M] |
 | Comisión del corredor | Usualmente cerca de 5% pagado por el vendedor, negociable, más ITBMS 7% sobre la comisión. Verificar licencia del corredor (Junta Técnica de Bienes Raíces). | [M] |
 | ITBMS en primera venta de obra nueva por promotor | Puede aplicar sobre parte del precio. Confirmar con DGI antes de modelar. | [V] |
 | Registro Público, notaría, paz y salvos, avalúo, comisión de apertura de hipoteca | Gastos del comprador. Modelar como porcentaje supuesto y marcarlo como tal hasta tener cotización real. | [V] |
@@ -56,7 +56,7 @@ Los comparables de EE.UU. usan precio de cierre público. En Panamá NO existe u
 
 ## 5. Costos de tenencia anuales
 
-- **Impuesto de Inmueble (IBI)**: escala progresiva sobre el valor catastral. Referencia residencial: primeros B/. 30,000 exentos, 0.5% de 30,001 a 75,000, 0.7% de 75,001 a 150,000, 1.0% sobre 150,000 [M]. Los inmuebles no residenciales tienen escalas más altas [V]. Existen exoneraciones para vivienda nueva con condiciones y vigencia cambiantes [V].
+- **Impuesto de Inmueble (IBI)**: escala progresiva sobre el valor catastral. Un extracto de la DGI (nov-2026, vía búsqueda) muestra 0% hasta B/. 30,000, 0.60% de 30,001 a 250,000 y 0.80% de 250,001 a 500,000; el tramo superior no se pudo confirmar [M]. Una nota de prensa menciona 0.7% para vivienda principal o Patrimonio Familiar Tributario [V]. La escala anterior de este módulo (0.5% / 0.7% / 1.0%) no coincidió con la DGI y se descartó. Confirmar siempre en dgi.mef.gob.pa. El valor catastral suele ser menor que el de mercado: preguntar el catastral real. Existen exoneraciones para vivienda nueva con condiciones y vigencia cambiantes [V].
 - **Cuota de mantenimiento PH**: dato obligatorio del anuncio o de la administración. Es el gasto operativo más grande en apartamentos. Calcular como USD/m²/mes y comparar con edificios similares.
 - Seguro de la propiedad: estimar según valor de reposición. Marcar como supuesto si no hay cotización.
 - Agua (IDAAN) y electricidad: gastos del inquilino salvo pacto. En condominios, el agua suele ir incluida en la cuota.
@@ -64,9 +64,9 @@ Los comparables de EE.UU. usan precio de cierre público. En Panamá NO existe u
 
 ## 6. Alquiler
 
-- Moneda USD por mes. Residencial de largo plazo usa contratos de arrendamiento regulados (Dirección de Arrendamientos del MIVIOT, protección al inquilino, desalojos con proceso formal). Verificar el régimen vigente antes de proyectar aumentos o desalojos [V]. Depósito de garantía usual de 1 a 2 meses [M].
+- Moneda USD por mes. Residencial de largo plazo usa contratos de arrendamiento regulados (Dirección de Arrendamientos del MIVIOT, protección al inquilino, desalojos con proceso formal). Se reportan la Ley 93 de 1973 y la Ley 28 de 1974 sobre arrendamientos, con registro del contrato en el MIVIOT [M]. Los detalles de depósito y aumentos provienen de guías comerciales: verificar el régimen vigente antes de proyectar aumentos o desalojos [V]. Depósito de garantía usual de 1 a 2 meses [M].
 - **ITBMS 7%**: el alquiler de inmuebles comerciales está gravado; el residencial está exento [M].
-- Alquiler de corta estancia (Airbnb): primero revisar el reglamento de la PH (muchas lo prohíben) y los requisitos de la Autoridad de Turismo de Panamá (ATP) y de impuestos de hospedaje [V]. Si no se puede confirmar que es legal, marcar el escenario como no viable.
+- Alquiler de corta estancia (Airbnb): primero revisar el reglamento de la PH (muchas lo prohíben) y los requisitos de la Autoridad de Turismo de Panamá (ATP) y de impuestos de hospedaje [V]. La prensa reporta que la ATP trata el hospedaje no registrado como clandestino, con multas de USD 5,000 a 50,000 [V]. Si no se puede confirmar que es legal, marcar el escenario como no viable.
 - **Supuestos por defecto (editables, NO son datos de mercado):** vacancia 10%, administración 8–10% (aunque se autoadministre), mantenimiento 5–8%, CapEx 5%. En algunos corredores de apartamentos ha habido sobreoferta histórica: validar vacancia y tiempo de colocación con datos actuales antes de bajar la vacancia.
 - Rendimiento bruto y neto se calculan con los alquileres comparables encontrados. NO aplicar la "regla del 1%" ni los umbrales de cap rate de EE.UU. como verdad absoluta: re-escalar el score contra los rendimientos de los comparables locales y declarar la re-escala.
 
@@ -80,7 +80,7 @@ Los comparables de EE.UU. usan precio de cierre público. En Panamá NO existe u
 
 ## 8. Impuestos sobre la renta de alquiler
 
-- ISR persona natural: tramos 0% hasta 11,000; 15% de 11,001 a 50,000; 25% sobre 50,000 [M]. ISR persona jurídica: 25% sobre renta neta gravable [M].
+- ISR persona natural: el tramo exento de 11,000 está confirmado por varias fuentes (DGI, Alegra, RSM); los tramos 15% de 11,001 a 50,000 y 25% sobre 50,000 tienen respaldo medio (PwC, Alegra) [M]. Si el alquiler es el único ingreso del propietario, el NOI puede quedar bajo el mínimo exento: modelar también con tasa marginal supuesta. ISR persona jurídica: 25% sobre renta neta gravable [M].
 - **No usar depreciación de 27.5 años (régimen de EE.UU.).** El tratamiento de depreciación y deducciones del alquiler para ISR debe validarse con un contador panameño. Mostrar el flujo antes de impuestos y una línea separada "ISR estimado (supuesto)".
 
 ## 9. Ajustes por estrategia
@@ -130,3 +130,11 @@ Consultar con WebSearch y WebFetch. Las búsquedas se hacen en español.
 ## 13. Descargo de responsabilidad (usar en español en toda salida)
 
 Este análisis es informativo y no constituye asesoría financiera, legal ni tributaria. Las cifras marcadas como supuesto o sin verificar deben confirmarse con corredor licenciado, abogado, contador y avaluador idóneo antes de tomar cualquier decisión de compra o inversión.
+
+## 14. Notas de uso aprendidas en pruebas
+
+- En la red de algunas sesiones en la nube, WebFetch no puede abrir encuentra24.com ni dgi.mef.gob.pa: los agentes solo ven resúmenes de WebSearch. Declarar esa limitación en el informe y bajar la confianza de los comparables. Si el usuario habilita esos hosts, repetir el análisis.
+- Si el usuario entrega la escritura, extraer: finca y código de ubicación, unidad, piso, estacionamiento y depósito, participación en áreas comunes, precio y fecha de compra (base para ganancia de capital), y cualquier gravamen, hipoteca o fideicomiso de garantía. La escritura de compraventa normalmente NO trae los m²: están en la escritura de constitución del PH o en el reglamento. No reproducir nombres ni documentos de identidad en los informes ni en las búsquedas web.
+- Si el inmueble es del propio usuario, el análisis es de decisión del propietario (conservar, vender, remodelar), no de compra: la señal Buy/Hold/Pass se traduce a esa decisión.
+- Los agentes tienden a atribuir al cliente datos que salieron de búsquedas web. Al consolidar, corregir la atribución y reconciliar supuestos entre agentes (por ejemplo alquiler, IBI y cuota PH) antes de calcular puntajes.
+
